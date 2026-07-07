@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Iphe's World - App Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  
+  <style>
+    /* CSS Root Variables for Interactive Theming */
+    :root {
+      --primary: #38bdf8;
+      --secondary: #c084fc;
+      --bg-dark: #070b14;
+      --text-main: #ffffff;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
+    
+    body { 
+      background: var(--bg-dark); 
+      color: var(--text-main); 
+      position: relative; 
+      overflow-x: hidden; 
+      padding: 0 0 90px 0; 
+      min-height: 100vh;
+      transition: background 0.5s ease;
+    }
+    
+    body::before {
+      content: ''; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: radial-gradient(circle at 20% 10%, rgba(56, 189, 248, 0.15) 0%, transparent 40%),
+                  radial-gradient(circle at 80% 90%, rgba(168, 85, 247, 0.15) 0%, transparent 40%);
+      z-index: 0; pointer-events: none; animation: backgroundShift 15s ease-in-out infinite alternate;
+    }
+    @keyframes backgroundShift { 0% { transform: scale(1); } 100% { transform: scale(1.1); } }
+
+    /* Light Theme Toggle Override */
+    body.light-theme { background: #e2e8f0; color: #0f172a; }
+    body.light-theme .search-bar { background: rgba(0,0,0,0.05); color: #000; border-color: rgba(0,0,0,0.1); }
+    body.light-theme .section-title, body.light-theme h4 { color: #0f172a; }
+    body.light-theme .setting-row { background: #ffffff; border-color: rgba(0,0,0,0.1); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+    body.light-theme .bottom-nav { background: rgba(255, 255, 255, 0.85); border-color: rgba(0,0,0,0.1); }
+    body.light-theme .nav-item { color: #64748b; }
+    body.light-theme .nav-item:hover { background: rgba(0, 0, 0, 0.05); color: #0f172a; }
+
+    .app-container { max-width: 800px; margin: 0 auto; position: relative; z-index: 2; padding: 15px; }
+
+    .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; animation: slideDown 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); }
+    .greeting h1 { font-size: 22px; font-weight: 800; background: linear-gradient(135deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .greeting p { font-size: 13px; color: #94a3b8; font-weight: 500; }
+    
+    .header-actions { display: flex; gap: 10px; }
+    .icon-btn { width: 40px; height: 40px; border-radius: 50%; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); display: flex; justify-content: center; align-items: center; font-size: 18px; cursor: pointer; transition: 0.2s; text-decoration: none; position: relative; }
+    .icon-btn:active { transform: scale(0.9); }
+    .icon-btn.logout:active { background: rgba(239, 68, 68, 0.2); border-color: #ef4444; }
+
+    /* NOTIFICATION FEED FIXED */
+    .notification-drawer { position: absolute; top: 70px; right: 15px; width: 300px; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(168, 85, 247, 0.4); border-radius: 16px; box-shadow: 0 20px 50px rgba(0,0,0,0.8); max-height: 400px; overflow-y: auto; opacity: 0; pointer-events: none; transform: translateY(-10px) scale(0.95); transition: 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); z-index: 100; transform-origin: top right; }
+    .notification-drawer.active { opacity: 1; pointer-events: auto; transform: translateY(0) scale(1); }
+    .notif-item { padding: 12px 15px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; gap: 4px; }
+    .notif-item:last-child { border-bottom: none; }
+    .notif-title { font-size: 13px; color: #fff; font-weight: 700; }
+    .notif-desc { font-size: 11px; color: #94a3b8; }
+
+    .search-wrapper { position: relative; margin-bottom: 25px; z-index: 50; animation: slideDown 0.7s cubic-bezier(0.2, 0.8, 0.2, 1); }
+    .search-bar { width: 100%; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); padding: 14px 20px; border-radius: 16px; color: var(--text-main); font-size: 14px; outline: none; transition: 0.3s; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+    .search-bar:focus { border-color: var(--secondary); background: rgba(0, 0, 0, 0.4); box-shadow: 0 0 20px rgba(168, 85, 247, 0.15); border-bottom-left-radius: 4px; border-bottom-right-radius: 4px; }
+
+    .search-results-container { position: absolute; top: calc(100% + 5px); left: 0; width: 100%; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(168, 85, 247, 0.4); border-radius: 16px; box-shadow: 0 20px 50px rgba(0,0,0,0.8); max-height: 350px; overflow-y: auto; opacity: 0; pointer-events: none; transform: translateY(-10px); transition: 0.3s; z-index: 55; }
+    .search-results-container.active { opacity: 1; pointer-events: auto; transform: translateY(0); }
+    .search-result-item { display: flex; gap: 12px; padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; transition: 0.2s; align-items: center; }
+    .search-result-item:hover { background: rgba(168, 85, 247, 0.1); }
+    .search-result-img { width: 55px; height: 55px; border-radius: 12px; object-fit: cover; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); }
+    .search-result-info { display: flex; flex-direction: column; gap: 4px; flex: 1; overflow: hidden; }
+    .search-result-info h4 { font-size: 14px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .search-result-info .price { font-size: 14px; color: var(--primary); font-weight: 800; }
+    .no-results { padding: 25px; text-align: center; font-size: 13px; color: #94a3b8; font-weight: 500; }
+
+    .promo-banner { background: linear-gradient(135deg, rgba(56, 189, 248, 0.1), rgba(168, 85, 247, 0.2)); border: 1px solid rgba(168, 85, 247, 0.3); border-radius: 20px; padding: 25px 20px; margin-bottom: 25px; position: relative; overflow: hidden; animation: popIn 0.8s ease both; }
+    .promo-banner::after { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent); transform: rotate(45deg); animation: shimmer 4s infinite; pointer-events: none; }
+    .promo-banner h2 { font-size: 20px; margin-bottom: 5px; color: #fff; }
+    .promo-banner p { font-size: 13px; color: #cbd5e1; margin-bottom: 15px; }
+    .promo-btn { background: var(--secondary); color: #0f172a; padding: 8px 16px; border-radius: 10px; font-weight: 700; font-size: 12px; border: none; cursor: pointer; box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4); }
+    .promo-btn.danger { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.4); box-shadow: none; }
+
+    .section-title { font-size: 16px; font-weight: 700; margin-bottom: 15px; color: #fff; animation: fadeUp 0.8s ease both; animation-delay: 0.1s; }
+    
+    .category-row { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; margin-bottom: 25px; animation: fadeUp 0.8s ease both; animation-delay: 0.2s; }
+    .category-row::-webkit-scrollbar { display: none; }
+    .cat-item { display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 70px; cursor: pointer; }
+    .cat-icon { width: 55px; height: 55px; border-radius: 16px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); display: flex; justify-content: center; align-items: center; font-size: 24px; transition: 0.3s; box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
+    .cat-item:hover .cat-icon { transform: translateY(-5px); border-color: var(--primary); background: rgba(56, 189, 248, 0.1); }
+    .cat-item span { font-size: 11px; color: #94a3b8; font-weight: 600; text-align: center; }
+
+    .grid-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+    .grid-item { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 18px; padding: 15px; text-align: left; transition: 0.3s; animation: fadeUp 0.8s ease both; position: relative; }
+    .grid-item:hover { transform: translateY(-5px); border-color: rgba(168, 85, 247, 0.3); background: rgba(255, 255, 255, 0.04); }
+    .grid-icon { font-size: 28px; margin-bottom: 10px; }
+    .grid-item h3 { font-size: 13px; color: #94a3b8; margin-bottom: 5px; }
+    .grid-item p { font-size: 18px; font-weight: 700; color: #ffffff; }
+
+    .setting-row { display: flex; justify-content: space-between; align-items: center; padding: 18px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; margin-bottom: 12px; animation: fadeUp 0.5s ease both; }
+    .toggle-switch { position: relative; width: 50px; height: 28px; }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255, 255, 255, 0.1); transition: .4s; border-radius: 34px; border: 1px solid rgba(255, 255, 255, 0.1); }
+    .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 3px; background-color: #fff; transition: .4s; border-radius: 50%; }
+    input:checked + .slider { background-color: var(--secondary); border-color: var(--secondary); }
+    input:checked + .slider:before { transform: translateX(20px); }
+
+    /* REAL-TIME ONLINE STATUS CSS */
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+    .status-dot.online { background: #4ade80; box-shadow: 0 0 8px #4ade80; animation: pulseBadge 2s infinite; }
+    .status-dot.offline { background: #64748b; }
+
+    .bottom-nav { position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%); width: 95%; max-width: 600px; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; padding: 10px 5px; display: flex; justify-content: space-around; align-items: center; z-index: 100; box-shadow: 0 20px 40px rgba(0,0,0,0.6); animation: slideUpNav 0.8s cubic-bezier(0.2, 0.8, 0.2, 1); }
+    .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; text-decoration: none; color: #94a3b8; width: 16%; height: 50px; border-radius: 16px; transition: 0.3s; position: relative; cursor: pointer; }
+    .nav-item.active { color: var(--primary); }
+    .nav-item i { font-size: 20px; font-style: normal; transition: 0.3s; }
+    .nav-item span { font-size: 10px; font-weight: 600; white-space: nowrap; }
+    .nav-item:hover { background: rgba(255, 255, 255, 0.05); color: var(--text-main); }
+    .nav-item:active i { transform: scale(0.8); }
+    .nav-item.active::after { content: ''; position: absolute; bottom: -2px; width: 4px; height: 4px; background: var(--primary); border-radius: 50%; box-shadow: 0 0 10px var(--primary); }
+    .badge { position: absolute; top: 2px; right: -5px; background: #ef4444; color: white; font-size: 9px; font-weight: 800; width: 16px; height: 16px; display: flex; justify-content: center; align-items: center; border-radius: 50%; border: 2px solid #0f172a; animation: pulseBadge 2s infinite; }
+
+    /* DASHBOARD IN-APP CHAT OVERLAY */
+    .chat-box-overlay { position: fixed; bottom: 20px; right: 20px; width: 350px; height: 450px; background: rgba(15, 23, 42, 0.95); border: 1px solid rgba(168, 85, 247, 0.4); border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.8); z-index: 150; display: flex; flex-direction: column; overflow: hidden; opacity: 0; pointer-events: none; transform: translateY(40px); transition: 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); backdrop-filter: blur(20px); }
+    .chat-box-overlay.active { opacity: 1; pointer-events: auto; transform: translateY(0); }
+    .chat-box-header { background: rgba(0,0,0,0.3); padding: 16px; border-bottom: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center; }
+    .chat-box-messages { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+    .msg-bubble { max-width: 75%; padding: 10px 14px; border-radius: 14px; font-size: 13px; line-height: 1.4; word-wrap: break-word; }
+    .msg-bubble.sent { background: linear-gradient(135deg, var(--secondary), #ec4899); color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
+    .msg-bubble.received { background: rgba(255, 255, 255, 0.08); color: #cbd5e1; align-self: flex-start; border-bottom-left-radius: 4px; }
+    .chat-box-input-area { padding: 12px; background: rgba(0,0,0,0.3); border-top: 1px solid rgba(255,255,255,0.08); display: flex; gap: 8px; }
+    .chat-box-input { flex: 1; padding: 10px 14px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: #fff; font-size: 13px; outline: none; }
+    .chat-box-send { background: var(--primary); border: none; color: #0f172a; padding: 0 16px; border-radius: 12px; font-weight: 700; cursor: pointer; }
+    .modal-close-btn { background: rgba(255,255,255,0.1); border: none; color: #fff; border-radius: 50%; width: 30px; height: 30px; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
+    @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes slideUpNav { from { opacity: 0; transform: translate(-50%, 50px); } to { opacity: 1; transform: translate(-50%, 0); } }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes popIn { 0% { opacity: 0; transform: scale(0.95); } 100% { opacity: 1; transform: scale(1); } }
+    @keyframes pulseBadge { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
+
+    @media(max-width: 650px) {
+      .chat-box-overlay { width: calc(100% - 30px); right: 15px; left: 15px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <header class="app-header">
+      <div class="greeting">
+        <h1 id="greetingHandle">Iphe's World</h1>
+        <p>Ready to explore the Matrix?</p>
+      </div>
+      <div class="header-actions">
+        <div class="icon-btn" onclick="toggleNotifications()">
+            🔔<div class="badge" id="notifBadge" style="display:none; right:-5px; top:-5px;">!</div>
+        </div>
+        <a href="index.html" class="icon-btn logout" title="Log Out">🚪</a>
+      </div>
+    </header>
+
+    <div class="notification-drawer" id="notifDrawer"></div>
+
+    <div class="search-wrapper">
+      <input type="text" id="mainSearchBar" class="search-bar" placeholder="🔍 Search for products, sellers, or categories..." autocomplete="off">
+      <div class="search-results-container" id="searchResultsBox"></div>
+    </div>
+
+    <div id="renderArea"></div>
+
+  </div>
+
+  <nav class="bottom-nav">
+    <div class="nav-item active" data-target="home">
+      <i>🏠</i><span>Home</span>
+    </div>
+    <a href="marketplace.html" class="nav-item">
+      <i>🛍️</i><span>Market</span>
+    </a>
+    <div class="nav-item" data-target="shop">
+      <i>🏬</i><span>My Shop</span>
+    </div>
+    <div class="nav-item" data-target="inbox">
+      <i style="position: relative;">💬<span class="badge" id="navChatBadge">0</span></i><span>Inbox</span>
+    </div>
+    <div class="nav-item" data-target="saved">
+      <i>❤️</i><span>Saved</span>
+    </div>
+    <div class="nav-item" data-target="settings">
+      <i>⚙️</i><span>Settings</span>
+    </div>
+  </nav>
+
+  <div class="chat-box-overlay" id="dashChatBoxInstance">
+    <div class="chat-box-header">
+      <div>
+        <h4 id="chatHeaderTargetUser" style="font-size:14px; color:#fff;">@User</h4>
+        <span id="chatHeaderTargetProduct" style="font-size:11px; color:var(--primary);">Context</span>
+      </div>
+      <button class="modal-close-btn" onclick="closeDashboardChat()">✕</button>
+    </div>
+    <div class="chat-box-messages" id="chatBoxMessageViewport"></div>
+    <div class="chat-box-input-area">
+      <input type="text" id="chatBoxInputField" class="chat-box-input" placeholder="Message..." onkeypress="handleChatKeyPress(event)">
+      <button class="chat-box-send" onclick="sendDashboardMessage()">Send</button>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, collection, doc, addDoc, setDoc, deleteDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    // Your production-ready verified configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyCsk4KLCHCvmjMwWNkc6gk5DeuWwDR8Xs4",
+      authDomain: "iphe-world.firebaseapp.com",
+      projectId: "iphe-world",
+      storageBucket: "iphe-world.firebasestorage.app",
+      messagingSenderId: "110852100220",
+      appId: "1:110852100220:web:fc4dca60cc0aac2c4e39f9",
+      measurementId: "G-GGLSFRM14D"
+    };
+
+    // Initialize Services
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Reactive State Engine
+    let appState = {
+        products: [],
+        chats: [],
+        onlineStatuses: {},
+        activeSection: 'home'
+    };
+
+    let currentUser = localStorage.getItem('iphe_marketplace_current_id') || '@Guest';
+    let activeDashboardThreadId = null;
+
+    const HOME_TEMPLATE = `
+        <div class="promo-banner">
+          <h2>⚡ Flash Sale Madness</h2>
+          <p>Up to 50% off premium tech & setups.</p>
+          <button class="promo-btn" onclick="window.location.href='marketplace.html'">Shop Deals Now</button>
+        </div>
+
+        <h3 class="section-title">Categories</h3>
+        <div class="category-row">
+          <div class="cat-item" onclick="window.location.href='marketplace.html?category=Electronics'"><div class="cat-icon">📱</div><span>Phones</span></div>
+          <div class="cat-item" onclick="window.location.href='marketplace.html?category=Electronics'"><div class="cat-icon">💻</div><span>Laptops</span></div>
+          <div class="cat-item" onclick="window.location.href='marketplace.html?category=Electronics'"><div class="cat-icon">🎧</div><span>Audio</span></div>
+          <div class="cat-item" onclick="window.location.href='marketplace.html?category=Fashion'"><div class="cat-icon">👕</div><span>Fashion</span></div>
+          <div class="cat-item" onclick="window.location.href='marketplace.html?category=Vehicles'"><div class="cat-icon">🚗</div><span>Auto</span></div>
+          <div class="cat-item" onclick="window.location.href='marketplace.html?category=Electronics'"><div class="cat-icon">🎮</div><span>Gaming</span></div>
+        </div>
+
+        <h3 class="section-title">Your Analytics</h3>
+        <div class="grid-container">
+          <div class="grid-item"><div class="grid-icon">🛡️</div><h3>Account Status</h3><p style="color: #4ade80;">Verified</p></div>
+          <div class="grid-item"><div class="grid-icon">👀</div><h3>Total Views</h3><p id="analyticsViews">0</p></div>
+          <div class="grid-item"><div class="grid-icon">💬</div><h3>Active Chats</h3><p id="analyticsChats" style="color: var(--secondary);">0</p></div>
+          <div class="grid-item"><div class="grid-icon">🔥</div><h3>Server Rank</h3><p style="color: #fbbf24;">Top 5%</p></div>
+        </div>
+    `;
+
+    if(currentUser !== '@Guest') document.getElementById('greetingHandle').textContent = `Hello, ${currentUser}`;
+
+    // --- REAL-TIME LIVE DATA LISTENERS ---
+
+    onSnapshot(collection(db, "products"), (snapshot) => {
+        let prods = [];
+        snapshot.forEach(doc => {
+            let data = doc.data();
+            data.id = doc.id; 
+            prods.push(data);
+        });
+        appState.products = prods;
+        renderActiveSection();
+    });
+
+    onSnapshot(query(collection(db, "chats"), orderBy("timestamp", "asc")), (snapshot) => {
+        let messages = [];
+        snapshot.forEach(doc => {
+            messages.push(doc.data());
+        });
+        appState.chats = messages;
+        updateNavBadges();
+        generateNotificationFeed();
+        if(activeDashboardThreadId) renderDashboardMessages();
+        renderActiveSection();
+    });
+
+    onSnapshot(collection(db, "status"), (snapshot) => {
+        let statuses = {};
+        snapshot.forEach(doc => {
+            statuses[doc.id] = doc.data().lastSeen;
+        });
+        appState.onlineStatuses = statuses;
+        if(appState.activeSection === 'inbox') renderActiveSection();
+    });
+
+    setInterval(async () => {
+        if(currentUser !== '@Guest') {
+            await setDoc(doc(db, "status", currentUser), { lastSeen: Date.now() }, { merge: true });
+        }
+    }, 8000);
+
+    // --- MAIN RENDER SECTION VIEW CONTROLLER ---
+    function renderActiveSection() {
+        const renderArea = document.getElementById('renderArea');
+        const wishlist = JSON.parse(localStorage.getItem('iphe_marketplace_wishlist')) || [];
+        const userProfile = JSON.parse(localStorage.getItem('iphe_marketplace_profile')) || {};
+
+        if (appState.activeSection === 'home') {
+            renderArea.innerHTML = HOME_TEMPLATE;
+            updateHomeAnalytics();
+        } 
+        else if (appState.activeSection === 'shop') {
+            const myItems = appState.products.filter(p => p.ownerId === currentUser);
+            let html = `<h3 class="section-title">🏬 My Published Inventory</h3>`;
+            if (myItems.length === 0) {
+                html += `<div class="no-results" style="background:rgba(255,255,255,0.02); border-radius:16px;">You haven't listed any items on the cloud database yet.</div>`;
+            } else {
+                html += `<div class="grid-container">` + myItems.map((p, i) => `
+                    <div class="grid-item" style="display:flex; flex-direction:column; gap:8px; animation-delay: ${0.1 * i}s;">
+                        <img src="${p.image}" style="width:100%; height:120px; object-fit:cover; border-radius:12px; background:rgba(0,0,0,0.3);">
+                        <h3 style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:#fff; font-size:14px;">${p.title}</h3>
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <p style="color:var(--primary); font-size:16px;">${p.price}</p>
+                            <button class="promo-btn danger" onclick="window.deleteFromDashboard('${p.id}')">Delete</button>
+                        </div>
+                    </div>`).join('') + `</div>`;
+            }
+            renderArea.innerHTML = html;
+        }
+        else if (appState.activeSection === 'saved') {
+            const savedItems = appState.products.filter(p => wishlist.includes(p.id));
+            let html = `<h3 class="section-title">❤️ Your Watchlist</h3>`;
+            if (savedItems.length === 0) {
+                html += `<div class="no-results" style="background:rgba(255,255,255,0.02); border-radius:16px;">You haven't saved any items yet.</div>`;
+            } else {
+                html += `<div class="grid-container">` + savedItems.map((p, i) => `
+                    <div class="grid-item" style="display:flex; flex-direction:column; gap:8px; animation-delay: ${0.1 * i}s;" onclick="window.location.href='marketplace.html'">
+                        <img src="${p.image}" style="width:100%; height:120px; object-fit:cover; border-radius:12px; background:rgba(0,0,0,0.3);">
+                        <h3 style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:#fff; font-size:14px;">${p.title}</h3>
+                        <p style="color:var(--primary); font-size:16px;">${p.price}</p>
+                    </div>`).join('') + `</div>`;
+            }
+            renderArea.innerHTML = html;
+        } 
+        else if (appState.activeSection === 'inbox') {
+            const userChats = appState.chats.filter(c => c.sender === currentUser || c.receiver === currentUser);
+            const threads = [...new Set(userChats.map(c => c.threadId))];
+            let html = `<h3 class="section-title">💬 Active Conversations</h3>`;
+            
+            if (threads.length === 0) {
+                html += `<div class="no-results" style="background:rgba(255,255,255,0.02); border-radius:16px;">Your cloud inbox is empty.</div>`;
+            } else {
+                html += `<div style="display:flex; flex-direction:column;">` + threads.map((t, i) => {
+                    const threadParts = t.split('_');
+                    const interactUser = threadParts[0] === currentUser ? threadParts[1] : threadParts[0];
+                    
+                    const lastSeen = appState.onlineStatuses[interactUser];
+                    let statusHtml = `<span class="status-dot offline"></span> Offline`;
+                    if (lastSeen && (Date.now() - parseInt(lastSeen) < 20000)) {
+                        statusHtml = `<span class="status-dot online"></span> Online`;
+                    }
+
+                    return `
+                    <div class="setting-row" style="cursor:pointer; animation-delay: ${0.1 * i}s;" onclick="window.openDashboardChat('${t}', '${interactUser}')">
+                        <div>
+                            <h4 style="font-size:14px; color:#fff; margin-bottom:4px;">Chat w/ ${interactUser}</h4>
+                            <div style="font-size:11px; color:#94a3b8; display:flex; align-items:center; gap:8px;">
+                                ${statusHtml}
+                                <span style="color:var(--secondary); background:rgba(168, 85, 247, 0.15); padding:2px 6px; border-radius:4px;">Node: ${t.substring(0,12)}...</span>
+                            </div>
+                        </div>
+                        <span style="font-size:18px; color:var(--primary);">➔</span>
+                    </div>`
+                }).join('') + `</div>`;
+            }
+            renderArea.innerHTML = html;
+        } 
+        else if (appState.activeSection === 'settings') {
+            renderArea.innerHTML = `
+                <h3 class="section-title">⚙️ Settings & Profile</h3>
+                <div class="setting-row" style="background: rgba(56, 189, 248, 0.05); border-color: rgba(56, 189, 248, 0.2);">
+                    <div>
+                        <h4 style="font-size:11px; color:#94a3b8; text-transform:uppercase; letter-spacing:1px; margin-bottom:4px;">Matrix ID</h4>
+                        <span style="font-size:20px; color:var(--primary); font-weight:800;">${currentUser}</span>
+                    </div>
+                    <div style="font-size:36px; filter: drop-shadow(0 0 10px rgba(56,189,248,0.5));">👤</div>
+                </div>
+
+                <h3 class="section-title" style="margin-top:25px; font-size:14px;">Centralized Seller Profile</h3>
+                <div class="setting-row" style="flex-direction:column; align-items:flex-start; gap:10px;">
+                    <input type="tel" id="regWa" placeholder="Default WhatsApp (e.g. 234...)" class="search-bar" style="margin-bottom:0;" value="${userProfile.wa || ''}">
+                    <input type="tel" id="regCall" placeholder="Default Call Line" class="search-bar" style="margin-bottom:0;" value="${userProfile.call || ''}">
+                    <input type="email" id="regEmail" placeholder="Default Email" class="search-bar" style="margin-bottom:0;" value="${userProfile.email || ''}">
+                    <button class="promo-btn" style="width:100%; padding:12px; background:var(--primary);" id="saveProfBtn">Save Auto-Fill Profile</button>
+                </div>
+
+                <h3 class="section-title" style="margin-top:25px; font-size:14px;">Theme Accent Palette</h3>
+                <div class="setting-row" style="justify-content:flex-start; gap:15px;">
+                    <div id="pal1" style="width:30px; height:30px; border-radius:50%; background:linear-gradient(135deg, #38bdf8, #c084fc); cursor:pointer; border: 2px solid #fff;"></div>
+                    <div id="pal2" style="width:30px; height:30px; border-radius:50%; background:linear-gradient(135deg, #4ade80, #fbbf24); cursor:pointer; border: 2px solid #fff;"></div>
+                    <div id="pal3" style="width:30px; height:30px; border-radius:50%; background:linear-gradient(135deg, #f43f5e, #f97316); cursor:pointer; border: 2px solid #fff;"></div>
+                </div>
+
+                <h3 class="section-title" style="margin-top:25px; font-size:14px;">System Preferences</h3>
+                <div class="setting-row">
+                    <span style="font-size:14px; font-weight:600; color:#fff;">Neon Light Mode</span>
+                    <label class="toggle-switch"><input type="checkbox" id="themeToggle"><span class="slider"></span></label>
+                </div>
+                <button class="promo-btn" style="width:100%; padding:14px; margin-top:20px; background:rgba(239, 68, 68, 0.15); color:#fca5a5; border:1px solid rgba(239, 68, 68, 0.3);" id="disconnectBtn">Disconnect Identity</button>
+            `;
+            
+            document.getElementById('saveProfBtn').onclick = saveUserProfile;
+            document.getElementById('disconnectBtn').onclick = executeDisconnect;
+            document.getElementById('themeToggle').onchange = function() { toggleTheme(this); };
+            document.getElementById('pal1').onclick = function() { setAccentPalette('#38bdf8', '#c084fc'); };
+            document.getElementById('pal2').onclick = function() { setAccentPalette('#4ade80', '#fbbf24'); };
+            document.getElementById('pal3').onclick = function() { setAccentPalette('#f43f5e', '#f97316'); };
+
+            if(document.body.classList.contains('light-theme')) {
+                document.getElementById('themeToggle').checked = true;
+            }
+        }
+    }
+
+    function updateHomeAnalytics() {
+        let totalViews = 0;
+        appState.products.forEach(p => { if (p.ownerId === currentUser) totalViews += (p.views || 0); });
+        const userChats = appState.chats.filter(c => c.sender === currentUser || c.receiver === currentUser);
+        const uniqueThreads = new Set(userChats.map(c => c.threadId));
+        
+        const viewsEl = document.getElementById('analyticsViews');
+        const chatsEl = document.getElementById('analyticsChats');
+        if(viewsEl) viewsEl.textContent = totalViews;
+        if(chatsEl) chatsEl.textContent = uniqueThreads.size;
+    }
+
+    function updateNavBadges() {
+        const userChats = appState.chats.filter(c => c.sender === currentUser || c.receiver === currentUser);
+        const uniqueThreads = new Set(userChats.map(c => c.threadId));
+        document.getElementById('navChatBadge').textContent = uniqueThreads.size;
+    }
+
+    function generateNotificationFeed() {
+        const myReceivedMsgs = appState.chats.filter(c => c.receiver === currentUser);
+        const notifDrawer = document.getElementById('notifDrawer');
+        if(myReceivedMsgs.length > 0) {
+            document.getElementById('notifBadge').style.display = 'flex';
+            const recent = myReceivedMsgs.slice(-5).reverse();
+            notifDrawer.innerHTML = `<div style="padding:15px; border-bottom:1px solid rgba(255,255,255,0.05); font-weight:800; color:var(--primary);">Recent Activity</div>`;
+            notifDrawer.innerHTML += recent.map(m => `
+                <div class="notif-item">
+                    <span class="notif-title">New message from ${m.sender}</span>
+                    <span class="notif-desc">"${m.text.length > 30 ? m.text.substring(0,30)+'...' : m.text}"</span>
+                </div>
+            `).join('');
+        } else {
+            document.getElementById('notifBadge').style.display = 'none';
+            notifDrawer.innerHTML = `<div class="no-results">No new notifications.</div>`;
+        }
+    }
+
+    // --- GLOBAL ACTIONS CONNECTED TO CLOUD ---
+    window.deleteFromDashboard = async function(productId) {
+        if(confirm("Are you sure you want to delete this item permanently from the cloud?")) {
+            await deleteDoc(doc(db, "products", productId));
+        }
+    };
+
+    window.openDashboardChat = function(threadId, interactUser) {
+        activeDashboardThreadId = threadId;
+        document.getElementById('chatHeaderTargetUser').textContent = interactUser;
+        document.getElementById('chatHeaderTargetProduct').textContent = `Node: ${threadId.substring(0, 10)}...`;
+        document.getElementById('dashChatBoxInstance').classList.add('active');
+        renderDashboardMessages();
+    };
+
+    window.sendDashboardMessage = async function() {
+        const field = document.getElementById('chatBoxInputField');
+        if(!field.value.trim() || !activeDashboardThreadId) return;
+        
+        const parts = activeDashboardThreadId.split('_');
+        let targetReceiver = parts[0] === currentUser ? parts[1] : parts[0];
+
+        await addDoc(collection(db, "chats"), {
+            id: Date.now(),
+            threadId: activeDashboardThreadId, 
+            productId: parts[2] || null, 
+            sender: currentUser, 
+            receiver: targetReceiver, 
+            text: field.value.trim(),
+            timestamp: Date.now()
+        });
+        
+        field.value = "";
+    };
+
+    function renderDashboardMessages() {
+        const cont = document.getElementById('chatBoxMessageViewport');
+        cont.innerHTML = "";
+        let rel = appState.chats.filter(m => m.threadId === activeDashboardThreadId);
+        rel.forEach(m => {
+            const c = m.sender === currentUser ? "sent" : "received";
+            cont.innerHTML += `<div class="msg-bubble ${c}">${m.text}</div>`;
+        });
+        cont.scrollTop = cont.scrollHeight;
+    }
+
+    // Input Search Component
+    document.getElementById('mainSearchBar').addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase().trim();
+        const resultsBox = document.getElementById('searchResultsBox');
+        if(!query) { resultsBox.classList.remove('active'); return; }
+
+        const matches = appState.products.filter(p => 
+          p.title.toLowerCase().includes(query) || p.category.toLowerCase().includes(query) || p.desc.toLowerCase().includes(query)
+        );
+
+        if(matches.length === 0) {
+          resultsBox.innerHTML = '<div class="no-results">No matches found in the Matrix.</div>';
+        } else {
+          resultsBox.innerHTML = matches.map(p => `
+            <div class="search-result-item" onclick="window.location.href='marketplace.html'">
+              <img src="${p.image}" class="search-result-img" alt="Item">
+              <div class="search-result-info"><h4>${p.title}</h4><span class="price">${p.price}</span></div>
+            </div>`).join('');
+        }
+        resultsBox.classList.add('active');
+    });
+
+    // Navigation Interactions Setup
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.addEventListener('click', function(e) {
+          const target = this.getAttribute('data-target');
+          if(target) {
+            e.preventDefault();
+            document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+            this.classList.add('active');
+            appState.activeSection = target;
+            renderActiveSection();
+          }
+        });
+    });
+
+    // UI Utilities
+    function saveUserProfile() {
+        const profile = {
+            wa: document.getElementById('regWa').value.trim(),
+            call: document.getElementById('regCall').value.trim(),
+            email: document.getElementById('regEmail').value.trim()
+        };
+        localStorage.setItem('iphe_marketplace_profile', JSON.stringify(profile));
+        alert("Auto-Fill Profile Saved!");
+    }
+
+    function setAccentPalette(primaryHex, secondaryHex) {
+        document.documentElement.style.setProperty('--primary', primaryHex);
+        document.documentElement.style.setProperty('--secondary', secondaryHex);
+        localStorage.setItem('iphe_matrix_palette', JSON.stringify({primary: primaryHex, secondary: secondaryHex}));
+    }
+
+    function toggleTheme(checkbox) {
+      if(checkbox.checked) document.body.classList.add('light-theme');
+      else document.body.classList.remove('light-theme');
+    }
+
+    function executeDisconnect() {
+        localStorage.setItem('iphe_marketplace_current_id', 'Guest_' + Math.floor(1000 + Math.random() * 9000));
+        window.location.href = 'login.html';
+    }
+
+    // Attach Event Handlers
+    window.closeDashboardChat = () => {
+        document.getElementById('dashChatBoxInstance').classList.remove('active');
+        activeDashboardThreadId = null;
+    };
+    window.handleChatKeyPress = (e) => { if(e.key === "Enter") window.sendDashboardMessage(); };
+    window.toggleNotifications = () => { document.getElementById('notifDrawer').classList.toggle('active'); };
+
+    document.addEventListener('click', (e) => {
+        const resultsBox = document.getElementById('searchResultsBox');
+        if(!e.target.closest('.search-wrapper')) resultsBox.classList.remove('active');
+        if(!e.target.closest('.header-actions') && !e.target.closest('.notification-drawer')) {
+            document.getElementById('notifDrawer').classList.remove('active');
+        }
+    });
+
+    // Initial Trigger
+    renderActiveSection();
+  </script>
+
+</body>
+</html>
