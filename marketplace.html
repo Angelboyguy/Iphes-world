@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<>
 <head>
   <title>Marketplace - Iphe's World</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -37,19 +37,17 @@
     .form-card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 24px; padding: 30px; margin-bottom: 35px; position: relative; }
     .form-card h3 { font-size: 18px; margin-bottom: 20px; color: #fff; font-weight: 700; }
     .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; }
-    .form-group { display: flex; flex-direction: column; gap: 6px; position: relative; }
+    .form-card div.form-group { display: flex; flex-direction: column; gap: 6px; position: relative; }
     .form-group label { font-size: 12px; color: #94a3b8; font-weight: 500; padding-left: 4px; }
     .form-group input, .form-group textarea, .form-group select { padding: 14px; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; color: #ffffff; font-size: 14px; outline: none; transition: 0.3s; }
     .form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: #38bdf8; background: rgba(0, 0, 0, 0.5); }
     .full-width { grid-column: 1 / -1; }
     .form-group select option { background: #0f172a; color: #fff; }
     
-    /* FEATURE 4: AI Voice Dictation UI */
     .dictate-btn { position: absolute; right: 10px; bottom: 10px; background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 8px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; z-index: 5; font-size: 16px; }
     .dictate-btn.recording { background: rgba(239, 68, 68, 0.3); border-color: #ef4444; animation: pulseGlow 1.5s infinite; }
     @keyframes pulseGlow { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
 
-    /* FEATURE 5: Flash Sale Checkbox UI */
     .flash-toggle-wrapper { display: flex; align-items: center; gap: 10px; background: rgba(245, 158, 11, 0.05); border: 1px solid rgba(245, 158, 11, 0.2); padding: 12px 15px; border-radius: 12px; cursor: pointer; margin-top: 10px; }
     .flash-toggle-wrapper input { cursor: pointer; accent-color: #fbbf24; width: 16px; height: 16px; }
     .flash-toggle-wrapper span { font-size: 13px; color: #fcd34d; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -72,11 +70,9 @@
 
     .product-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; perspective: 1000px; }
     
-    /* FEATURE 6: 3D Holographic Tilt Card Base */
     .product-card { position: relative; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 24px; padding: 16px; display: flex; flex-direction: column; cursor: pointer; transition: transform 0.1s ease-out, box-shadow 0.1s ease-out, border-color 0.4s; transform-style: preserve-3d; }
     .product-card:hover { border-color: rgba(168, 85, 247, 0.4); z-index: 10; }
     
-    /* FEATURE 5: Flash Sale Card Glow */
     .product-card.flash-active { border-color: #fbbf24; box-shadow: 0 0 25px rgba(245, 158, 11, 0.15); }
     .flash-timer { position: absolute; top: -10px; left: 16px; background: linear-gradient(90deg, #fbbf24, #f59e0b); color: #000; font-weight: 800; font-size: 11px; padding: 4px 10px; border-radius: 8px; z-index: 10; box-shadow: 0 4px 10px rgba(245, 158, 11, 0.4); text-transform: uppercase; letter-spacing: 0.5px; }
 
@@ -90,7 +86,6 @@
     .category-badge { padding: 4px 10px; border-radius: 8px; font-size: 10px; font-weight: 700; text-transform: uppercase; background: rgba(56, 189, 248, 0.1); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.2); }
     .condition-badge { padding: 4px 10px; border-radius: 8px; font-size: 10px; font-weight: 700; text-transform: uppercase; background: rgba(168, 85, 247, 0.1); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.2); }
     
-    /* FEATURE 7: Auto-Generated Smart Tags UI */
     .smart-tags-container { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; transform: translateZ(20px); }
     .smart-tag { background: rgba(255,255,255,0.05); border: 1px dashed rgba(255,255,255,0.2); color: #e2e8f0; font-size: 10px; padding: 2px 8px; border-radius: 12px; font-weight: 600; letter-spacing: 0.5px; }
 
@@ -148,7 +143,6 @@
     .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: #38bdf8; color: #0f172a; padding: 14px 28px; border-radius: 30px; font-weight: 700; font-size: 14px; z-index: 300; transition: 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); box-shadow: 0 10px 30px rgba(56, 189, 248, 0.4); }
     .toast.show { transform: translateX(-50%) translateY(0); }
 
-    /* FEATURE 8: Confetti Particle Canvas */
     #confettiCanvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 9999; }
 
     @media(max-width: 650px) {
@@ -160,7 +154,6 @@
 </head>
 <body>
 
-  <!-- Cinematic Lightbox Overlay -->
   <div class="lightbox-overlay" id="imageLightbox" onclick="closeLightbox()">
       <img id="lightboxImg" class="lightbox-img" src="" alt="Full Screen Zoom">
   </div>
@@ -229,11 +222,9 @@
           <div class="form-group full-width">
             <label>Description</label>
             <textarea id="prodDesc" rows="2" required placeholder="Describe the item..."></textarea>
-            <!-- Feature 4: Dictate Button -->
             <button type="button" class="dictate-btn" id="dictateBtn" onclick="toggleDictation()" title="Use Voice to Text">🎙️</button>
           </div>
           
-          <!-- Feature 5: Flash Sale Checkbox -->
           <div class="form-group full-width">
             <label class="flash-toggle-wrapper">
               <input type="checkbox" id="prodFlashSale">
@@ -277,7 +268,6 @@
         <span id="modalCondition" class="condition-badge"></span>
       </div>
       
-      <!-- Feature 7 Target: Smart Tags inside modal -->
       <div id="modalSmartTags" class="smart-tags-container"></div>
       
       <h2 id="modalTitle" style="font-size: 22px; margin-bottom: 4px; color:#fff; font-weight:800;"></h2>
@@ -531,7 +521,18 @@
       grid.innerHTML = "";
 
       let dynamicMatches = productCatalog.filter(item => {
-        const matchesCategory = selectedCategoryFilter === "All" || (selectedCategoryFilter === "Watchlist" && wishlistCatalog.includes(item.id)) || (item.category === selectedCategoryFilter);
+        // BUG FIX 1: Handle 'InboxChats' category to filter items containing user's active dialog threads
+        let matchesCategory = false;
+        if (selectedCategoryFilter === "All") {
+          matchesCategory = true;
+        } else if (selectedCategoryFilter === "Watchlist") {
+          matchesCategory = wishlistCatalog.includes(item.id);
+        } else if (selectedCategoryFilter === "InboxChats") {
+          matchesCategory = messageDatabase.some(m => m.productId === item.id && (m.sender === currentLoggedUser || m.receiver === currentLoggedUser));
+        } else {
+          matchesCategory = (item.category === selectedCategoryFilter);
+        }
+
         const matchesText = item.title.toLowerCase().includes(searchQuery) || item.desc.toLowerCase().includes(searchQuery);
         return matchesCategory && matchesText;
       });
@@ -798,7 +799,10 @@
 
     window.deleteProduct = async function(targetId) {
       const targetItem = productCatalog.find(item => item.id === targetId);
-      if (targetItem.ownerId !== currentLoggedUser && !currentLoggedUser.startsWith('Guest_')) return alert("Permission denied!");
+      // BUG FIX 2: Strict check ensuring ONLY the item owner can delete the product listing. Guests cannot wipe others out.
+      if (targetItem.ownerId !== currentLoggedUser) {
+        return alert("Permission denied! You do not own this listing.");
+      }
       
       await deleteDoc(doc(db, "products", targetId));
       triggerCustomNotificationToast("Deleted from Cloud.");
@@ -807,7 +811,10 @@
     window.toggleMarkAsSold = async function(targetId, e) {
       e.stopPropagation();
       const targetItem = productCatalog.find(item => item.id === targetId);
-      if (targetItem.ownerId !== currentLoggedUser && !currentLoggedUser.startsWith('Guest_')) return alert("Permission denied!");
+      // BUG FIX 2 CONT: Strict check ensuring ONLY the item owner can mark it as sold.
+      if (targetItem.ownerId !== currentLoggedUser) {
+        return alert("Permission denied! You do not own this listing.");
+      }
       
       await updateDoc(doc(db, "products", targetId), { isSold: !targetItem.isSold });
       
@@ -825,7 +832,7 @@
     window.initializeDirectChatSession = function(pId, targetOwner, title) {
       if(currentLoggedUser === targetOwner) return alert("This is your item!");
       const lex = [currentLoggedUser, targetOwner].sort();
-      activeOpenThreadId = `${lex[0]}_${lex[1]}_${pId}`;
+      activeOpenThreadId = `${lex[0]}|||${lex[1]}|||${pId}`; // Upgraded delimiter to ||| to protect usernames containing underscores
       activeOpenProductContextId = pId;
       document.getElementById('chatHeaderTargetUser').textContent = targetOwner;
       document.getElementById('chatHeaderTargetProduct').textContent = title;
@@ -838,7 +845,7 @@
       const field = document.getElementById('chatBoxInputField');
       if(!field.value.trim() || !activeOpenThreadId) return;
       
-      const parts = activeOpenThreadId.split('_');
+      const parts = activeOpenThreadId.split('|||');
       let targetReceiver = parts[0] === currentLoggedUser ? parts[1] : parts[0];
 
       await addDoc(collection(db, "chats"), {
@@ -868,7 +875,7 @@
     window.handleChatKeyPress = function(e) { if(e.key === "Enter") transmitChatMessage(); }
     window.closeFloatingChatInstance = function() { document.getElementById('p2pChatBoxInstance').classList.remove('active'); }
 
-    // If using the external search bar event listeners
+    // External search bar event listeners initialization
     const searchBarElement = document.getElementById('searchBar');
     if(searchBarElement) {
         searchBarElement.addEventListener('input', executeCombinedFilters);
@@ -877,4 +884,5 @@
     if(sortSelectElement) {
         sortSelectElement.addEventListener('change', executeCombinedFilters);
     }
-</script>
+  </script>
+  
